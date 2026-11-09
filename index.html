@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PHOENIX — Autonomous AI Agent</title>
+    <meta name="description" content="Futuristic goal-driven AI agent web application featuring dynamic planning, real-time telemetry, execution controls, and verification reports." />
+    <meta property="og:title" content="PHOENIX — Autonomous AI Agent" />
+    <meta property="og:description" content="Futuristic goal-driven AI agent web application featuring dynamic planning, real-time telemetry, execution controls, and verification reports." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script>
+      // Gracefully ignore WebSocket HMR connection failures in preview environments per AI Studio guidelines
+      window.addEventListener('unhandledrejection', function (e) {
+        if (
+          e.reason &&
+          (typeof e.reason.message === 'string' &&
+            (e.reason.message.includes('WebSocket') ||
+             e.reason.message.includes('closed without opened') ||
+             e.reason.message.includes('vite:ws')))
+        ) {
+          e.preventDefault();
+        }
+      });
+    </script>
+  </head>
+  <body class="bg-[#090A10] text-slate-100 antialiased selection:bg-purple-600 selection:text-white overflow-x-hidden min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

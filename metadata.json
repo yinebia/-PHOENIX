@@ -1,0 +1,6 @@
+{
+  "name": "PHOENIX — Autonomous AI Agent",
+  "description": "Futuristic goal-driven AI agent web application featuring dynamic planning, real-time telemetry, execution controls, and verification reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
