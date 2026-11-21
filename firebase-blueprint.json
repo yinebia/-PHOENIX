@@ -1,0 +1,310 @@
+{
+  "entities": {
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "Authenticated PHOENIX user profile and workspace preferences stored privately per user.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 254
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "role": {
+          "type": "string",
+          "enum": ["customer"]
+        },
+        "defaultPersona": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "defaultDepth": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "soundEnabled": {
+          "type": "boolean"
+        },
+        "privacyAcceptedAt": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "displayName", "role", "createdAt", "updatedAt"]
+    },
+    "MissionRecord": {
+      "title": "MissionRecord",
+      "description": "Private PHOENIX autonomous mission record with tasks, logs, checkpoints, verification report, and response feedback.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "persona": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "executionDepth": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "targetDeadline": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "idle",
+            "planning",
+            "awaiting_clarification",
+            "executing",
+            "awaiting_approval",
+            "paused",
+            "completed",
+            "cancelled",
+            "failed"
+          ]
+        },
+        "currentStage": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "progress": {
+          "type": "number"
+        },
+        "currentStepId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "lastCheckpointStepId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "understanding": {
+          "type": "object"
+        },
+        "clarificationAnswers": {
+          "type": "object"
+        },
+        "clarificationResolved": {
+          "type": "boolean"
+        },
+        "tasks": {
+          "type": "array"
+        },
+        "logs": {
+          "type": "array"
+        },
+        "artifactsSummary": {
+          "type": "array"
+        },
+        "report": {
+          "type": "object"
+        },
+        "responseFeedback": {
+          "type": "object"
+        },
+        "startedAt": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "endedAt": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "elapsedMs": {
+          "type": "number"
+        },
+        "executionSpeed": {
+          "type": "number"
+        },
+        "migratedFromGuest": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "title",
+        "goal",
+        "persona",
+        "executionDepth",
+        "targetDeadline",
+        "status",
+        "progress",
+        "startedAt",
+        "executionSpeed",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MissionFile": {
+      "title": "MissionFile",
+      "description": "Generated deliverable file belonging strictly to an owner's mission.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "missionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180
+        },
+        "format": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 500000
+        },
+        "stepId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "timestamp": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "isRealExecution": {
+          "type": "boolean"
+        },
+        "validated": {
+          "type": "boolean"
+        },
+        "validationSummary": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "missionId",
+        "name",
+        "format",
+        "content",
+        "timestamp",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdminRegistryEntry": {
+      "title": "AdminRegistryEntry",
+      "description": "Server-managed administrator role registry; never client-writable.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 254
+        },
+        "grantedBy": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "grantedBy", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserAccount" },
+      "description": "Private user account profile and workspace preferences."
+    },
+    "/users/{userId}/missions/{missionId}": {
+      "schema": { "$ref": "#/entities/MissionRecord" },
+      "description": "Private missions, task plans, logs, checkpoints, and verification reports owned by userId."
+    },
+    "/users/{userId}/missions/{missionId}/files/{fileId}": {
+      "schema": { "$ref": "#/entities/MissionFile" },
+      "description": "Deliverable files generated by PHOENIX strictly under the owning user and mission."
+    },
+    "/admins/{adminUid}": {
+      "schema": { "$ref": "#/entities/AdminRegistryEntry" },
+      "description": "Locked administrator registry separating operator/admin permissions from customer accounts."
+    }
+  }
+}

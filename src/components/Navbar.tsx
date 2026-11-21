@@ -1,17 +1,43 @@
 import React from 'react';
-import { Flame, Volume2, VolumeX, History, HelpCircle, Activity, Play, PlusCircle, ShieldAlert } from 'lucide-react';
+import {
+  Volume2,
+  VolumeX,
+  History,
+  HelpCircle,
+  Activity,
+  Compass,
+  UserCheck,
+  LogIn,
+  ShieldAlert,
+  MessageSquare,
+  SlidersHorizontal,
+  Sparkles,
+} from 'lucide-react';
 import { Mission } from '../types/agent';
+import { BRAND_CONFIG } from '../config/brand';
+import { PhoenixEmblem, EmblemMood } from './PhoenixEmblem';
 
 interface NavbarProps {
   currentMission: Mission | null;
   historyCount: number;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  animationsEnabled: boolean;
+  onToggleAnimations: () => void;
+  advancedMode: boolean;
+  onToggleAdvancedMode: () => void;
   onOpenHistory: () => void;
   onOpenHelp: () => void;
   onNewMission: () => void;
+  onOpenChat: () => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  accountEmail?: string | null;
+  accountName?: string | null;
+  isVerifiedAccount?: boolean;
+  isAdmin?: boolean;
+  onOpenAccount: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -19,206 +45,368 @@ export const Navbar: React.FC<NavbarProps> = ({
   historyCount,
   soundEnabled,
   onToggleSound,
+  animationsEnabled,
+  onToggleAnimations,
+  advancedMode,
+  onToggleAdvancedMode,
   onOpenHistory,
   onOpenHelp,
-  onNewMission,
+  onOpenChat,
   activeTab,
   setActiveTab,
+  accountEmail,
+  accountName,
+  isVerifiedAccount,
+  isAdmin,
+  onOpenAccount,
+  onOpenAdmin,
 }) => {
-  const getStatusBadge = () => {
-    if (!currentMission || currentMission.status === 'idle') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-slate-800/80 text-slate-300 border border-slate-700">
-          <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-          STANDBY
-        </span>
-      );
-    }
+  const emblemMood: EmblemMood = !currentMission
+    ? 'idle'
+    : currentMission.status === 'failed'
+    ? 'error'
+    : currentMission.status === 'completed'
+    ? currentMission.report?.metrics?.failedSteps || currentMission.report?.metrics?.skippedSteps
+      ? 'partial'
+      : 'celebrating'
+    : currentMission.status === 'executing' || currentMission.status === 'planning'
+    ? 'active'
+    : 'idle';
+
+  const getStatusLabel = () => {
+    if (!currentMission || currentMission.status === 'idle') return null;
     if (currentMission.status === 'planning') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-purple-500/15 text-purple-300 border border-purple-500/40 animate-pulse">
-          <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-          PLANNING DAG
-        </span>
-      );
+      return {
+        text: advancedMode ? 'Planning' : 'Understanding your goal',
+        cls: 'text-purple-200 border-purple-500/40 bg-purple-950/50',
+      };
+    }
+    if (currentMission.status === 'awaiting_clarification') {
+      return {
+        text: advancedMode ? 'Clarification Needed' : 'Quick question for you',
+        cls: 'text-cyan-200 border-cyan-500/50 bg-cyan-950/50',
+      };
+    }
+    if (currentMission.status === 'awaiting_approval') {
+      return {
+        text: advancedMode ? 'Approval Required' : 'Needs your approval',
+        cls: 'text-amber-200 border-amber-500/50 bg-amber-950/50',
+      };
     }
     if (currentMission.status === 'executing') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/20">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-          EXECUTING ({Math.round(currentMission.progress)}%)
-        </span>
-      );
+      return {
+        text: advancedMode
+          ? `Executing (${Math.round(currentMission.progress)}%)`
+          : `Working (${Math.round(currentMission.progress)}%)`,
+        cls: 'text-cyan-200 border-cyan-500/40 bg-cyan-950/50',
+      };
     }
     if (currentMission.status === 'paused') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-amber-500/15 text-amber-300 border border-amber-500/40">
-          <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-          PAUSED
-        </span>
-      );
+      return {
+        text: 'Paused',
+        cls: 'text-amber-200 border-amber-500/40 bg-amber-950/40',
+      };
+    }
+    if (currentMission.status === 'failed') {
+      return {
+        text: advancedMode ? 'Recovery Needed' : 'Needs attention',
+        cls: 'text-rose-200 border-rose-500/50 bg-rose-950/50',
+      };
     }
     if (currentMission.status === 'completed') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/40">
-          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-          VERIFIED SATISFIED
-        </span>
-      );
+      const hasIssues =
+        currentMission.report &&
+        (currentMission.report.metrics.failedSteps > 0 ||
+          currentMission.report.metrics.skippedSteps > 0 ||
+          (currentMission.report.metrics.simulatedToolsRun ?? 0) > 0);
+      return hasIssues
+        ? {
+            text: advancedMode ? 'Partial / Draft Ready' : 'Draft ready',
+            cls: 'text-amber-200 border-amber-500/40 bg-amber-950/40',
+          }
+        : {
+            text: advancedMode ? 'Verified & Ready' : 'Ready for you',
+            cls: 'text-amber-200 border-amber-400/50 bg-amber-950/35',
+          };
     }
     if (currentMission.status === 'cancelled') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-rose-500/15 text-rose-300 border border-rose-500/40">
-          <span className="w-2 h-2 rounded-full bg-rose-400"></span>
-          ABORTED
-        </span>
-      );
+      return {
+        text: 'Stopped',
+        cls: 'text-slate-300 border-slate-700 bg-slate-900/70',
+      };
     }
     return null;
   };
 
+  const statusBadge = getStatusLabel();
+  const hasActiveProject = Boolean(currentMission && currentMission.status !== 'idle');
+
   return (
-    <header className="sticky top-0 z-40 bg-[#090A12]/90 backdrop-blur-xl border-b border-purple-900/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-40 bg-[#090A12]/92 backdrop-blur-xl border-b border-amber-500/15">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-2">
+          {/* Left: Golden Phoenix Brand Identity */}
+          <div className="flex items-center gap-3 min-w-0">
             <button
+              type="button"
               onClick={() => setActiveTab('dashboard')}
-              className="flex items-center gap-2.5 text-left group focus:outline-none"
+              className="flex items-center gap-2.5 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-xl cursor-pointer shrink-0 min-h-[44px]"
             >
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 p-[1px] shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-all">
-                <div className="w-full h-full bg-[#0B0D17] rounded-[11px] flex items-center justify-center">
-                  <Flame className="w-5 h-5 text-cyan-400 group-hover:text-purple-300 transition-colors animate-pulse" />
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-display font-black text-lg tracking-wider bg-gradient-to-r from-purple-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
-                    PHOENIX
-                  </span>
-                  <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                    v3.8
+              <PhoenixEmblem
+                size="sm"
+                mood={emblemMood}
+                animationsEnabled={animationsEnabled}
+              />
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display font-black text-base sm:text-lg tracking-wider bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-200 bg-clip-text text-transparent whitespace-nowrap">
+                    {BRAND_CONFIG.name}
                   </span>
                 </div>
-                <p className="text-[10px] font-mono text-slate-400 hidden sm:block">
-                  Autonomous Goal-Driven AI Agent
+                <p className="text-[10px] font-mono tracking-[0.16em] text-amber-300/80 hidden sm:block whitespace-nowrap">
+                  {BRAND_CONFIG.descriptor}
                 </p>
               </div>
             </button>
 
-            <div className="hidden md:block ml-4 pl-4 border-l border-slate-800">
-              {getStatusBadge()}
-            </div>
+            {statusBadge && (
+              <div className="hidden lg:flex items-center pl-3 ml-1 border-l border-slate-800">
+                <span
+                  className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-mono border ${statusBadge.cls}`}
+                >
+                  {statusBadge.text}
+                </span>
+              </div>
+            )}
           </div>
 
-          {/* Quick Actions & Navigation */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Right: Clean Everyday Navigation & Controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
-              onClick={onNewMission}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md shadow-purple-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              title="Launch new goal"
+              type="button"
+              onClick={onOpenChat}
+              className="min-h-[44px] px-2.5 sm:px-3 rounded-lg text-xs font-medium text-cyan-200 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-500/35 flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              title="Talk with PHOENIX"
             >
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">New Goal</span>
+              <MessageSquare className="w-4 h-4 text-cyan-300" />
+              <span className="hidden sm:inline">Chat</span>
             </button>
 
             <button
+              type="button"
               onClick={onOpenHistory}
-              className="relative p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 transition-colors border border-slate-800"
-              title="Project History & Archives"
+              className="min-h-[44px] px-2.5 sm:px-3 rounded-lg text-slate-200 hover:text-white hover:bg-slate-800/80 transition-colors border border-slate-800 flex items-center gap-1.5 text-xs font-medium cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              title={advancedMode ? 'Missions Archive' : 'Your saved projects'}
             >
-              <History className="w-4 h-4" />
+              <History className="w-4 h-4 text-amber-300" />
+              <span className="hidden md:inline">
+                {advancedMode ? 'Missions' : 'Projects'}
+              </span>
               {historyCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-cyan-500 text-[9px] font-bold text-slate-950 font-mono">
-                  {historyCount}
+                <span className="text-[11px] font-mono text-amber-300 font-semibold tabular-nums">
+                  ({historyCount})
                 </span>
               )}
             </button>
 
             <button
-              onClick={onToggleSound}
-              className={`p-2 rounded-lg border transition-colors ${
-                soundEnabled
-                  ? 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10'
-                  : 'text-slate-500 border-slate-800 hover:text-slate-400'
+              type="button"
+              onClick={onToggleAdvancedMode}
+              className={`min-h-[44px] px-2.5 rounded-lg border transition-colors flex items-center gap-1.5 text-xs font-medium cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 ${
+                advancedMode
+                  ? 'bg-purple-600/25 border-purple-400/60 text-purple-200'
+                  : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
               }`}
-              title={soundEnabled ? 'Mute Audio FX' : 'Enable Cyber Audio Cues'}
+              title={
+                advancedMode
+                  ? 'Switch back to simple everyday mode'
+                  : 'Turn on Advanced Mode for technical tools, DAG & logs'
+              }
+              aria-pressed={advancedMode}
             >
-              {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">
+                {advancedMode ? 'Advanced On' : 'Advanced'}
+              </span>
             </button>
 
             <button
+              type="button"
+              onClick={onOpenAccount}
+              className={`min-h-[44px] px-2.5 sm:px-3 rounded-lg border transition-colors flex items-center gap-1.5 text-xs font-medium cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+                accountEmail
+                  ? 'bg-emerald-500/10 border-emerald-500/35 text-emerald-200 hover:bg-emerald-500/20'
+                  : 'bg-slate-900/80 border-slate-700 text-slate-200 hover:border-amber-400/50 hover:text-amber-200'
+              }`}
+              title={
+                accountEmail
+                  ? `Signed in as ${accountEmail}`
+                  : 'Sign in or create a free account to save your work'
+              }
+            >
+              {accountEmail ? (
+                <>
+                  <UserCheck className="w-4 h-4 text-emerald-400" />
+                  <span className="hidden lg:inline max-w-[110px] truncate">
+                    {accountName || accountEmail.split('@')[0]}
+                  </span>
+                  {!isVerifiedAccount && (
+                    <span
+                      className="w-1.5 h-1.5 rounded-full bg-amber-400"
+                      title="Email verification pending"
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-4 h-4 text-amber-300" />
+                  <span className="hidden sm:inline">Sign In</span>
+                </>
+              )}
+            </button>
+
+            {isAdmin && onOpenAdmin && (
+              <button
+                type="button"
+                onClick={onOpenAdmin}
+                className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition-colors cursor-pointer flex items-center justify-center"
+                title="Admin Overview"
+              >
+                <ShieldAlert className="w-4 h-4" />
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onToggleAnimations}
+              className={`hidden sm:flex min-h-[44px] min-w-[44px] p-2 rounded-lg border transition-colors cursor-pointer items-center justify-center ${
+                animationsEnabled
+                  ? 'text-amber-300 border-amber-500/30 bg-amber-500/10'
+                  : 'text-slate-500 border-slate-800 hover:text-slate-300'
+              }`}
+              title={
+                animationsEnabled
+                  ? 'Celebration effects ON (click to disable)'
+                  : 'Celebration effects OFF (click to enable)'
+              }
+              aria-pressed={animationsEnabled}
+            >
+              <Sparkles className="w-4 h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={onToggleSound}
+              className={`min-h-[44px] min-w-[44px] p-2 rounded-lg border transition-colors cursor-pointer flex items-center justify-center ${
+                soundEnabled
+                  ? 'text-cyan-300 border-cyan-500/30 bg-cyan-500/10'
+                  : 'text-slate-500 border-slate-800 hover:text-slate-300'
+              }`}
+              title={soundEnabled ? 'Mute sound cues' : 'Enable sound cues'}
+              aria-pressed={soundEnabled}
+            >
+              {soundEnabled ? (
+                <Volume2 className="w-4 h-4" />
+              ) : (
+                <VolumeX className="w-4 h-4" />
+              )}
+            </button>
+
+            <button
+              type="button"
               onClick={onOpenHelp}
-              className="p-2 rounded-lg text-slate-400 hover:text-purple-300 hover:bg-purple-950/30 transition-colors border border-slate-800"
-              title="Agent Architecture & Beginner Guide"
+              className="hidden sm:flex min-h-[44px] min-w-[44px] p-2 rounded-lg text-slate-400 hover:text-amber-200 hover:bg-slate-800/60 transition-colors border border-slate-800 cursor-pointer items-center justify-center"
+              title="How PHOENIX works"
             >
               <HelpCircle className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Tab Navigation for Active Mission */}
-        {currentMission && currentMission.status !== 'idle' && (
-          <div className="flex items-center gap-1 overflow-x-auto py-2 border-t border-slate-800/60 no-scrollbar">
+        {/* Workspace Navigation Strip — shown cleanly when a project is active */}
+        {hasActiveProject && currentMission && (
+          <div className="flex items-center gap-1.5 overflow-x-auto py-1.5 border-t border-slate-800/70 no-scrollbar">
             <button
-              onClick={() => setActiveTab('planner')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                activeTab === 'planner'
-                  ? 'bg-purple-500/20 text-purple-200 border border-purple-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+              type="button"
+              onClick={() => setActiveTab('dashboard')}
+              className={`min-h-[38px] px-3 py-1 rounded-lg text-xs whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                activeTab === 'dashboard'
+                  ? 'bg-amber-500/15 text-amber-200 border border-amber-400/45 font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
               }`}
             >
-              <span>01 // Task Planner</span>
-              {currentMission.tasks.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-purple-900/60 text-purple-300">
-                  {currentMission.tasks.length}
-                </span>
-              )}
+              <Compass className="w-3.5 h-3.5 text-amber-300" />
+              <span>{advancedMode ? 'Command Centre' : 'Home'}</span>
             </button>
 
+            <span className="text-slate-700 px-0.5 select-none">|</span>
+
+            {advancedMode && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('planner')}
+                className={`min-h-[38px] px-3 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                  activeTab === 'planner'
+                    ? 'bg-purple-500/20 text-purple-200 border border-purple-500/40'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                }`}
+              >
+                <span>Plan &amp; DAG</span>
+                {currentMission.tasks.length > 0 && (
+                  <span className="text-[10px] text-purple-300 tabular-nums">
+                    ({currentMission.tasks.length})
+                  </span>
+                )}
+              </button>
+            )}
+
             <button
+              type="button"
               onClick={() => setActiveTab('execution')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all flex items-center gap-1.5 ${
+              className={`min-h-[38px] px-3 py-1 rounded-lg text-xs whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
                 activeTab === 'execution'
-                  ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
               }`}
             >
-              <span>02 // Execution Monitor</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-950 text-cyan-400">
+              <span>{advancedMode ? 'Execution Monitor' : 'Working on it'}</span>
+              <span className="text-[11px] font-mono text-cyan-300 tabular-nums">
                 {Math.round(currentMission.progress)}%
               </span>
             </button>
 
-            <button
-              onClick={() => setActiveTab('logs')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                activeTab === 'logs'
-                  ? 'bg-slate-800 text-slate-100 border border-slate-700 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-              }`}
-            >
-              <Activity className="w-3.5 h-3.5 text-cyan-400" />
-              <span>03 // Activity Logs</span>
-              {currentMission.logs.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-900 text-slate-400">
-                  {currentMission.logs.length}
-                </span>
-              )}
-            </button>
+            {advancedMode && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('logs')}
+                className={`min-h-[38px] px-3 py-1 rounded-lg text-xs font-mono whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                  activeTab === 'logs'
+                    ? 'bg-slate-800 text-slate-100 border border-slate-700'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                }`}
+              >
+                <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Logs</span>
+                {currentMission.logs.length > 0 && (
+                  <span className="text-[10px] text-slate-400 tabular-nums">
+                    ({currentMission.logs.length})
+                  </span>
+                )}
+              </button>
+            )}
 
             <button
+              type="button"
               onClick={() => setActiveTab('report')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap transition-all flex items-center gap-1.5 ${
+              className={`min-h-[38px] px-3 py-1 rounded-lg text-xs whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
                 activeTab === 'report'
-                  ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  ? 'bg-amber-500/20 text-amber-200 border border-amber-400/50 font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
               }`}
             >
-              <span>04 // Verification Report</span>
+              <span>{advancedMode ? 'Mission Delivery' : 'Your results'}</span>
               {currentMission.report && (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-950 text-emerald-400 font-bold">
+                <span className="text-[11px] font-mono text-amber-300 font-bold tabular-nums">
                   {currentMission.report.satisfactionScore}%
                 </span>
               )}

@@ -1,16 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Terminal, 
-  Search, 
-  Download, 
-  Filter, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Cpu, 
-  Layers, 
-  FileCode,
-  ArrowDown,
-  Trash2
+import {
+  Terminal,
+  Search,
+  Download,
+  Trash2,
 } from 'lucide-react';
 import { ActivityLog, LogLevel } from '../types/agent';
 
@@ -51,6 +44,14 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ logs, onClearL
         return <span className="text-emerald-400 font-mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-800/60 font-semibold">[GATE_PASS]</span>;
       case 'ARTIFACT':
         return <span className="text-indigo-300 font-mono text-[10px] px-1.5 py-0.5 rounded bg-indigo-950/80 border border-indigo-800/60 font-semibold">[ARTIFACT_VAULT]</span>;
+      case 'APPROVAL':
+        return <span className="text-amber-300 font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-950/90 border border-amber-500/60 font-semibold">[APPROVAL_GATE]</span>;
+      case 'CLARIFICATION':
+        return <span className="text-cyan-200 font-mono text-[10px] px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-500/60 font-semibold">[CLARIFICATION]</span>;
+      case 'RETRY':
+        return <span className="text-yellow-300 font-mono text-[10px] px-1.5 py-0.5 rounded bg-yellow-950/80 border border-yellow-600/60 font-semibold">[RECOVERY_RETRY]</span>;
+      case 'ERROR':
+        return <span className="text-rose-300 font-mono text-[10px] px-1.5 py-0.5 rounded bg-rose-950/90 border border-rose-500/60 font-semibold">[EXEC_ERROR]</span>;
       case 'WARN':
         return <span className="text-amber-400 font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-950/80 border border-amber-800/60 font-semibold">[ADVISORY]</span>;
       default:
@@ -60,23 +61,13 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ logs, onClearL
 
   const handleExportText = () => {
     const content = logs
-      .map((l) => `[${l.timestamp}] [${l.level}] ${l.title} - ${l.message} ${l.simulated ? '(SIMULATED)' : ''}`)
+      .map((l) => `[${l.timestamp}] [${l.level}]${l.stage ? ` [${l.stage}]` : ''} ${l.title} - ${l.message} ${l.simulated ? '(SIMULATED)' : ''}`)
       .join('\n');
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `phoenix_audit_log_${Date.now()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleExportJson = () => {
-    const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `phoenix_audit_log_${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -133,7 +124,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ logs, onClearL
       <div className="p-3 bg-[#0B0D17] border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
         {/* Log Level Filters */}
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
-          {(['ALL', 'REASONING', 'EXEC', 'ARTIFACT', 'SUCCESS', 'WARN'] as const).map((lvl) => (
+          {(['ALL', 'REASONING', 'CLARIFICATION', 'EXEC', 'APPROVAL', 'RETRY', 'ERROR', 'ARTIFACT', 'SUCCESS', 'WARN'] as const).map((lvl) => (
             <button
               key={lvl}
               onClick={() => setFilterLevel(lvl)}
@@ -182,8 +173,23 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ logs, onClearL
               </span>
               <div className="shrink-0">{getLevelBadge(log.level)}</div>
               <div className="flex-1 min-w-0">
+                {log.stage && (
+                  <span className="mr-1.5 text-[10px] text-purple-300 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-800/50">
+                    {log.stage}
+                  </span>
+                )}
                 <span className="text-slate-200 font-semibold mr-1.5">{log.title}:</span>
                 <span className="text-slate-400 font-normal">{log.message}</span>
+                {log.toolType === 'REAL' && (
+                  <span className="ml-2 text-[10px] text-emerald-300 bg-emerald-950/60 px-1 rounded border border-emerald-800/50">
+                    [REAL TOOL]
+                  </span>
+                )}
+                {log.toolType === 'LLM_REASONING' && (
+                  <span className="ml-2 text-[10px] text-purple-300 bg-purple-950/60 px-1 rounded border border-purple-800/50">
+                    [AI SYNTHESIS]
+                  </span>
+                )}
                 {log.simulated && (
                   <span className="ml-2 text-[10px] text-cyan-400/90 bg-cyan-950/60 px-1 rounded border border-cyan-900/50">
                     [SIMULATED]

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Info, Sparkles, Terminal } from 'lucide-react';
+import { ShieldCheck, Sparkles, Lock } from 'lucide-react';
 
 export const SystemNoticeBanner: React.FC = () => {
   return (
@@ -11,21 +11,21 @@ export const SystemNoticeBanner: React.FC = () => {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
           </span>
           <span className="font-mono text-cyan-300 font-semibold uppercase tracking-wider">
-            Safe Demo Workflow
+            PHOENIX Hybrid Execution Core
           </span>
           <span className="hidden sm:inline text-slate-500">|</span>
           <span className="text-slate-400">
-            Real AI reasoning active via <span className="text-purple-300 font-medium">Gemini 3.8 Flash</span>. External execution tools operate in safe isolated simulation.
+            Real backend tools &amp; <span className="text-purple-300 font-medium">Gemini 4 Flash</span> synthesis active. External publishing/outreach actions require explicit approval.
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[11px] font-mono">
-            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Zero Unsafe Mutations</span>
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-mono">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Honest Verification</span>
           </div>
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-[11px] font-mono">
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span>Strict Verification Audit</span>
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-mono">
+            <Lock className="w-3.5 h-3.5 text-amber-400" />
+            <span>Human Approval Gates</span>
           </div>
         </div>
       </div>

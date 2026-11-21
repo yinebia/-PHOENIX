@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>PHOENIX — Autonomous AI Agent</title>
-    <meta name="description" content="Futuristic goal-driven AI agent web application featuring dynamic planning, real-time telemetry, execution controls, and verification reports." />
-    <meta property="og:title" content="PHOENIX — Autonomous AI Agent" />
-    <meta property="og:description" content="Futuristic goal-driven AI agent web application featuring dynamic planning, real-time telemetry, execution controls, and verification reports." />
+    <title>PHOENIX — Autonomous Intelligence</title>
+    <meta name="description" content="PHOENIX — The AI that turns intentions into reality. Friendly on the surface, six-stage verified execution underneath." />
+    <meta property="og:title" content="PHOENIX — Autonomous Intelligence" />
+    <meta property="og:description" content="PHOENIX — The AI that turns intentions into reality." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,17 +14,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
     <script>
       // Gracefully ignore WebSocket HMR connection failures in preview environments per AI Studio guidelines
-      window.addEventListener('unhandledrejection', function (e) {
-        if (
-          e.reason &&
-          (typeof e.reason.message === 'string' &&
-            (e.reason.message.includes('WebSocket') ||
-             e.reason.message.includes('closed without opened') ||
-             e.reason.message.includes('vite:ws')))
-        ) {
-          e.preventDefault();
-        }
-      });
+      window.addEventListener(
+        'unhandledrejection',
+        function (e) {
+          var msg = e && e.reason && typeof e.reason.message === 'string' ? e.reason.message : '';
+          if (
+            msg.indexOf('WebSocket') !== -1 ||
+            msg.indexOf('closed without opened') !== -1 ||
+            msg.indexOf('vite:ws') !== -1
+          ) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        },
+        true
+      );
     </script>
   </head>
   <body class="bg-[#090A10] text-slate-100 antialiased selection:bg-purple-600 selection:text-white overflow-x-hidden min-h-screen">

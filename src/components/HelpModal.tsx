@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, HelpCircle, Target, GitBranch, Play, ShieldCheck, Award } from 'lucide-react';
+import { X, HelpCircle, Target, GitBranch, Play, ShieldCheck, Award, RefreshCw } from 'lucide-react';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div 
+      <div
         className="glass-panel w-full max-w-2xl rounded-2xl border-purple-500/30 overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -22,10 +22,10 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h3 className="font-display font-bold text-sm text-slate-100 uppercase tracking-wider">
-                Operator Field Manual // PHOENIX Guide
+                How PHOENIX Works
               </h3>
-              <p className="text-[11px] font-mono text-slate-400">
-                Beginner Guide to Autonomous Goal-Driven Execution
+              <p className="text-[11px] text-slate-400">
+                Simple on the surface, six-stage verification underneath
               </p>
             </div>
           </div>
@@ -42,56 +42,63 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <div className="space-y-2">
             <h4 className="font-display font-bold text-sm text-cyan-300 flex items-center gap-2">
               <Target className="w-4 h-4 text-cyan-400" />
-              1. Goal Input & Persona Selection
+              1. Six-Stage Execution Intelligence
             </h4>
             <p className="leading-relaxed text-slate-400">
-              State any technical or business objective in natural language (or click any of our 4 pre-configured missions). Choose an agent persona (e.g. Vanguard Architect for systems, Cyber Sentinel for security).
+              PHOENIX turns human intentions into digital outcomes across six structured stages:
             </p>
+            <ul className="list-disc pl-5 space-y-1 text-slate-400 font-mono text-[11px]">
+              <li><strong className="text-cyan-300">UNDERSTAND:</strong> Interprets your goal, resource constraints, and missing inputs.</li>
+              <li><strong className="text-purple-300">STRATEGISE:</strong> Identifies opportunities/risks and builds a dependency-aware DAG.</li>
+              <li><strong className="text-indigo-300">EXECUTE:</strong> Runs real backend tools, AI deliverable synthesis, or labeled demo routines.</li>
+              <li><strong className="text-sky-300">COORDINATE:</strong> Passes upstream outputs between dependent tasks and maintains checkpoints.</li>
+              <li><strong className="text-amber-300">VERIFY &amp; RECOVER:</strong> Checks outputs deterministically, handles errors, and retries safely.</li>
+              <li><strong className="text-emerald-300">DELIVER:</strong> Issues an honest report with completed assets and unresolved issues.</li>
+            </ul>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-display font-bold text-sm text-purple-300 flex items-center gap-2">
               <GitBranch className="w-4 h-4 text-purple-400" />
-              2. AI Task Planner (DAG Deconstruction)
+              2. Strict Tool Classifications
             </h4>
             <p className="leading-relaxed text-slate-400">
-              PHOENIX uses Gemini 3.8 Flash to transform your goal into an execution graph with phases (Discovery, Architecture, Execution, Validation, Delivery). Each task has designated tools and expected deliverables.
+              Every step declares whether it executes on a real backend engine, uses Gemini synthesis, or runs in a safe demo container:
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-slate-400 font-mono text-[11px]">
+              <li><strong className="text-emerald-300">[REAL TOOL]:</strong> Deterministic backend tools (calculator, artifact_validator, verification_harness).</li>
+              <li><strong className="text-purple-300">[AI SYNTHESIS]:</strong> Gemini 4 Flash generating real HTML, Markdown, or JSON deliverables.</li>
+              <li><strong className="text-slate-300">[SIMULATED]:</strong> Safe demo containers where live external integrations are not connected.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-display font-bold text-sm text-amber-300 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              3. Autonomy with Human Control (Approval Gates)
+            </h4>
+            <p className="leading-relaxed text-slate-400">
+              PHOENIX pauses automatically before steps involving spending money, sending emails, contacting prospective customers, or publishing websites. You decide whether to <strong className="text-emerald-300">Approve &amp; Execute</strong> or <strong className="text-amber-300">Decline &amp; Preserve Draft</strong>.
             </p>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-display font-bold text-sm text-indigo-300 flex items-center gap-2">
-              <Play className="w-4 h-4 text-indigo-400" />
-              3. Interactive Execution Controls
+              <RefreshCw className="w-4 h-4 text-indigo-400" />
+              4. Failure Recovery &amp; Checkpointing
             </h4>
             <p className="leading-relaxed text-slate-400">
-              You are in full control at every moment:
+              If a tool fails or produces invalid output, PHOENIX records the actual error, runs Stage 5 recovery diagnosis, preserves all completed checkpoint artifacts, and lets you retry or finalize an honest partial report without fabricating success.
             </p>
-            <ul className="list-disc pl-5 space-y-1 text-slate-400 font-mono text-[11px]">
-              <li><strong className="text-amber-300">PAUSE:</strong> Halts the active execution step immediately.</li>
-              <li><strong className="text-cyan-300">RESUME:</strong> Continues from the exact frozen state.</li>
-              <li><strong className="text-purple-300">STEP NEXT:</strong> Step manually through one task at a time.</li>
-              <li><strong className="text-rose-300">CANCEL:</strong> Safely aborts the mission and generates an incident report.</li>
-            </ul>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-display font-bold text-sm text-emerald-300 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              4. Safe Demo Workflow & Simulated Actions
+              <Award className="w-4 h-4 text-emerald-400" />
+              5. Controls &amp; Deliverable Vault
             </h4>
             <p className="leading-relaxed text-slate-400">
-              Real AI reasoning is powered live by Gemini. External tool invocations (such as writing external databases or public web queries) operate in safe isolated demo mode and are clearly labeled <span className="font-mono text-cyan-300">[SIMULATED]</span> to protect your environment.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-display font-bold text-sm text-yellow-300 flex items-center gap-2">
-              <Award className="w-4 h-4 text-yellow-400" />
-              5. Verification Reports & Deliverables
-            </h4>
-            <p className="leading-relaxed text-slate-400">
-              Upon task completion, the AI verification engine calculates a Goal Satisfaction Score (0-100%), performs a risk assessment, and bundles verified deliverables (schemas, configs, code) for immediate inspection and export.
+              Use <span className="font-mono text-amber-300">PAUSE</span>, <span className="font-mono text-cyan-300">RESUME</span>, <span className="font-mono text-purple-300">STEP NEXT</span>, and <span className="font-mono text-rose-300">CANCEL</span> anytime. Inspect or download any generated HTML website, strategy document, or verification certificate directly from the Artifact Vault.
             </p>
           </div>
         </div>
@@ -101,7 +108,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-mono text-xs font-semibold transition-colors"
           >
-            Acknowledge & Close
+            Acknowledge &amp; Close
           </button>
         </div>
       </div>

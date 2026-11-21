@@ -83,6 +83,39 @@
   100% { transform: translateY(1000%); }
 }
 
+.glow-gold {
+  box-shadow: 0 0 28px -6px rgba(245, 158, 11, 0.45);
+}
+
 .animate-scanline {
   animation: scanline 8s linear infinite;
 }
+
+@keyframes phoenixIlluminate {
+  0%, 100% {
+    box-shadow: 0 0 18px -4px rgba(245, 158, 11, 0.35), 0 0 6px -2px rgba(253, 230, 138, 0.25);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 32px -2px rgba(251, 191, 36, 0.65), 0 0 14px 0 rgba(253, 230, 138, 0.4);
+    transform: scale(1.03);
+  }
+}
+
+.phoenix-emblem-illuminate {
+  animation: phoenixIlluminate 2.6s ease-in-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phoenix-emblem-illuminate,
+  .animate-scanline,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+  * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
